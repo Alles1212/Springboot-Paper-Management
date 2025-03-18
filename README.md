@@ -2,6 +2,7 @@
 ## Purpose
 Aiming to category the paper I read using Spring Boot with MVC & Controller-Service-Dao.
 ## Schema
+```plaintext
 paper-management-system
 ├── src
 │   ├── main
@@ -19,10 +20,10 @@ paper-management-system
 │   │   │       └── model
 │   │   │           └── Paper.java                         // 論文的資料模型 (Entity)
 │   │   └── resources
-│   │       ├── application.properties                   // 配置檔，包含 MySQL 連線設定
-│   │       └── schema.sql                               // 資料表建立腳本 (可選)
+│   │       ├── application.properties                     // 配置檔，包含 MySQL 連線設定
+│   │       └── schema.sql                                 // 資料表建立腳本(optional)
 └── pom.xml
-
+```
 ## Usage
 - Language : Java
 - Database : MySQL
