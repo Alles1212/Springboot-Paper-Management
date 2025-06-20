@@ -24,7 +24,7 @@ public class PaperDaoImpl implements PaperDao {
             paper.setId(rs.getLong("id"));
             paper.setTitle(rs.getString("title"));
             paper.setAuthor(rs.getString("author"));
-            paper.setAbstractText(rs.getString("abstract"));
+            paper.setAbstractText(rs.getString("abstractText"));
             return paper;
         }
     }
@@ -43,13 +43,13 @@ public class PaperDaoImpl implements PaperDao {
 
     @Override
     public int save(Paper paper) {
-        String sql = "INSERT INTO paper (title, author, abstract) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO paper (title, author, abstractText) VALUES (?, ?, ?)";
         return jdbcTemplate.update(sql, paper.getTitle(), paper.getAuthor(), paper.getAbstractText());
     }
 
     @Override
     public int update(Paper paper) {
-        String sql = "UPDATE paper SET title = ?, author = ?, abstract = ? WHERE id = ?";
+        String sql = "UPDATE paper SET title = ?, author = ?, abstractText = ? WHERE id = ?";
         return jdbcTemplate.update(sql, paper.getTitle(), paper.getAuthor(), paper.getAbstractText(), paper.getId());
     }
 

@@ -1,0 +1,47 @@
+services:
+  # Spring Boot 應用程式服務
+  app:
+    # 使用當前目錄下的 Dockerfile 進行建置
+    build: .
+    # 容器名稱
+    container_name: springboot-app
+    # 將容器的 8080 port 映射到主機的 8080 port
+    ports:
+      - "8080:8080"
+    # 設定環境變數，覆蓋 application.properties 中的設定
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/myjdbc?serverTimezone=Asia/Taipei&characterEncoding=utf-8
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=springboot
+    # 依賴於 db 服務，確保 db 服務先啟動
+    depends_on:
+      - db
+    # 網路設定
+    networks:
+      - spring-net
+
+  # MySQL 資料庫服務
+  db:
+    # 使用官方的 MySQL 8.0 映像
+    image: mysql:8.0
+    # 容器名稱
+    container_name: mysql-db
+    # 設定 MySQL 的環境變數
+    environment:
+      MYSQL_ROOT_PASSWORD: springboot
+      MYSQL_DATABASE: myjdbc
+    # 將資料庫數據持久化到主機的 ./mysql-data 目錄
+    volumes:
+      - mysql-data:/var/lib/mysql
+    # 網路設定
+    networks:
+      - spring-net
+
+# 定義網路
+networks:
+  spring-net:
+    driver: bridge
+
+# 定義數據卷
+volumes:
+  mysql-data: 
