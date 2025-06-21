@@ -1,4 +1,5 @@
 # Spring Boot Paper Management
+[Revision version using python+bs](https://github.com/Alles1212/Spring_boot_paper_management_bs)
 ## Purpose
 This is a Spring Boot-based academic paper management system, using MVC architecture and Controller-Service-DAO pattern. The system integrates Google Scholar crawler, which can automatically search, extract and manage academic papers.
 ## Main Features
