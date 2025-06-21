@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>論文管理系統 - 爬蟲測試</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            border-left: 4px solid #007bff;
+        }
+        .paper-item {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        .paper-title {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        .paper-author {
+            color: #666;
+            font-style: italic;
+            margin-bottom: 10px;
+        }
+        .paper-abstract {
+            color: #555;
+            line-height: 1.5;
+        }
+        .loading {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>論文管理系統 - Google Scholar 爬蟲</h1>
+        
+        <div class="form-group">
+            <label for="keyword">搜尋關鍵字：</label>
+            <input type="text" id="keyword" placeholder="例如：machine learning, AI, 深度學習" value="machine learning">
+        </div>
+        
+        <div class="form-group">
+            <label for="maxResults">最大結果數量：</label>
+            <input type="number" id="maxResults" min="1" max="50" value="10">
+        </div>
+        
+        <div class="form-group">
+            <label for="yearFrom">起始年份（可選）：</label>
+            <input type="number" id="yearFrom" min="1900" max="2024" placeholder="例如：2020">
+        </div>
+        
+        <div class="form-group">
+            <label for="yearTo">結束年份（可選）：</label>
+            <input type="number" id="yearTo" min="1900" max="2024" placeholder="例如：2024">
+        </div>
+        
+        <div class="form-group">
+            <label for="sortBy">排序方式：</label>
+            <select id="sortBy">
+                <option value="relevance">相關性</option>
+                <option value="date">日期</option>
+            </select>
+        </div>
+        
+        <button onclick="crawlPapers()">爬取論文</button>
+        <button onclick="crawlAndSave()">爬取並儲存</button>
+        <button onclick="testCrawler()">測試爬蟲</button>
+        
+        <div id="result" class="result" style="display: none;">
+            <h3>爬取結果：</h3>
+            <div id="papersList"></div>
+        </div>
+    </div>
+
+    <script>
+        async function crawlPapers() {
+            const request = buildRequest();
+            await callAPI('/crawler/google-scholar', request, '爬取論文');
+        }
+        
+        async function crawlAndSave() {
+            const request = buildRequest();
+            await callAPI('/crawler/google-scholar/save', request, '爬取並儲存論文');
+        }
+        
+        async function testCrawler() {
+            showLoading('測試爬蟲中...');
+            try {
+                const response = await fetch('/crawler/test');
+                const result = await response.text();
+                showResult(result);
+            } catch (error) {
+                showResult('測試失敗：' + error.message);
+            }
+        }
+        
+        function buildRequest() {
+            return {
+                keyword: document.getElementById('keyword').value,
+                maxResults: parseInt(document.getElementById('maxResults').value),
+                yearFrom: document.getElementById('yearFrom').value ? parseInt(document.getElementById('yearFrom').value) : null,
+                yearTo: document.getElementById('yearTo').value ? parseInt(document.getElementById('yearTo').value) : null,
+                sortBy: document.getElementById('sortBy').value
+            };
+        }
+        
+        async function callAPI(endpoint, request, action) {
+            showLoading(action + '中...');
+            try {
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(request)
+                });
+                
+                if (response.ok) {
+                    const papers = await response.json();
+                    showPapers(papers);
+                } else {
+                    showResult('請求失敗：' + response.status);
+                }
+            } catch (error) {
+                showResult('錯誤：' + error.message);
+            }
+        }
+        
+        function showLoading(message) {
+            document.getElementById('result').style.display = 'block';
+            document.getElementById('papersList').innerHTML = '<div class="loading">' + message + '</div>';
+        }
+        
+        function showResult(message) {
+            document.getElementById('result').style.display = 'block';
+            document.getElementById('papersList').innerHTML = '<div class="loading">' + message + '</div>';
+        }
+        
+        function showPapers(papers) {
+            document.getElementById('result').style.display = 'block';
+            const papersList = document.getElementById('papersList');
+            
+            if (papers.length === 0) {
+                papersList.innerHTML = '<div class="loading">沒有找到相關論文</div>';
+                return;
+            }
+            
+            let html = '<p>找到 ' + papers.length + ' 篇論文：</p>';
+            papers.forEach((paper, idx) => {
+                html += `
+                    <div class="paper-item">
+                        <div class="paper-title">${paper.title || '無標題'}</div>
+                        <div class="paper-author">${paper.author || '未知作者'}</div>
+                        <div><b>期刊：</b>${paper.journal || '無'}</div>
+                        <div><b>出版年份：</b>${paper.year || '無'}</div>
+                        <div class="paper-abstract">${paper.abstractText || '無摘要'}</div>
+                        <button onclick="saveSinglePaper(${idx})">儲存</button>
+                    </div>
+                `;
+            });
+            papersList.innerHTML = html;
+            document.getElementById('papersList').papers = papers;
+        }
+
+        async function saveSinglePaper(idx) {
+            const paper = document.getElementById('papersList').papers[idx] || null;
+            const papers = document.getElementById('papersList').papers;
+            const singlePaper = papers[idx];
+            try {
+                const response = await fetch('/crawler/save-selected', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify([singlePaper])
+                });
+                if (response.ok) {
+                    alert('儲存成功！');
+                } else {
+                    alert('儲存失敗');
+                }
+            } catch (e) {
+                alert('儲存失敗：' + e.message);
+            }
+        }
+    </script>
+</body>
+</html> 

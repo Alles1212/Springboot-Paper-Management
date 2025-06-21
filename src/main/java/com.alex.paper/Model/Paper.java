@@ -5,15 +5,19 @@ public class Paper {
     private String title;
     private String author;
     private String abstractText; // abstract 為保留字，故用 abstractText
+    private String journal; // 期刊
+    private Integer year;   // 出版年份
 
     // Constructors
     public Paper() {}
 
-    public Paper(Long id, String title, String author, String abstractText) {
+    public Paper(Long id, String title, String author, String abstractText, String journal, Integer year) {
         this.id = id;
         this.title = title;
         this.author = author;
         this.abstractText = abstractText;
+        this.journal = journal;
+        this.year = year;
     }
 
     // Getter 與 Setter
@@ -47,5 +51,21 @@ public class Paper {
 
     public void setAbstractText(String abstractText) {
         this.abstractText = abstractText;
+    }
+
+    public String getJournal() {
+        return journal;
+    }
+
+    public void setJournal(String journal) {
+        this.journal = journal;
+    }
+
+    public Integer getYear() {
+        return year;
+    }
+
+    public void setYear(Integer year) {
+        this.year = year;
     }
 }
